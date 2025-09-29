@@ -1,0 +1,75 @@
+/* Live Tracking System Styles */
+.progress-bar[data-progress] {
+  width: calc(var(--progress, 0) * 1%);
+}
+
+.progress-bar[data-progress="0"] { width: 0%; }
+.progress-bar[data-progress*="."] { 
+  width: calc(attr(data-progress number, 0) * 1%); 
+}
+
+/* Animation for fade in */
+@keyframes fade-in {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-fade-in {
+  animation: fade-in 0.5s ease-out;
+}
+
+/* Enhanced progress bar styles */
+.progress-bar {
+  position: relative;
+  background: linear-gradient(90deg, #3b82f6, #22c55e);
+  border-radius: 6px;
+  height: 12px;
+  transition: width 1s ease-in-out;
+}
+
+/* Navigation heading rotation - handled by transform class from Tailwind */
+.transform[data-heading] {
+  transform: rotate(calc(attr(data-heading, 0) * 1deg));
+}
+
+.progress-bar::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+  background-size: 50% 100%;
+  animation: shimmer 2s infinite;
+  border-radius: 6px;
+}
+
+@keyframes shimmer {
+  0% {
+    background-position: -50% 0;
+  }
+  100% {
+    background-position: 150% 0;
+  }
+}
+
+/* Live indicator pulse */
+.live-pulse {
+  animation: pulse-glow 2s infinite;
+}
+
+@keyframes pulse-glow {
+  0%, 100% {
+    box-shadow: 0 0 5px rgba(239, 68, 68, 0.5);
+  }
+  50% {
+    box-shadow: 0 0 20px rgba(239, 68, 68, 0.8);
+  }
+}

@@ -1,0 +1,34 @@
+version: '3.8'
+
+services:
+  backend:
+    build: 
+      context: ./backend
+      dockerfile: Dockerfile
+    ports:
+      - "8003:8003"
+    environment:
+      - PORT=8003
+      - CORS_ORIGINS=http://localhost:5175
+      - ENVIRONMENT=production
+    volumes:
+      - ./backend:/app
+    networks:
+      - aviflux-network
+
+  frontend:
+    build:
+      context: ./frontend  
+      dockerfile: Dockerfile
+    ports:
+      - "5175:5175"
+    environment:
+      - VITE_API_URL=http://backend:8003
+    depends_on:
+      - backend
+    networks:
+      - aviflux-network
+
+networks:
+  aviflux-network:
+    driver: bridge
