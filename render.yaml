@@ -7,13 +7,6 @@ services:
     plan: starter
     healthCheckPath: /health
     envVars:
-      - key: PORT
-        value: 10000
-      - key: CORS_ORIGINS
-        fromService:
-          type: web
-          name: aviflux-frontend
-          property: url
       - key: ENVIRONMENT
         value: production
 
@@ -36,7 +29,4 @@ services:
         destination: /index.html
     envVars:
       - key: VITE_API_URL
-        fromService:
-          type: web
-          name: aviflux-backend
-          property: url
+        value: https://aviflux-backend.onrender.com
