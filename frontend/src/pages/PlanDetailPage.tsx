@@ -246,9 +246,17 @@ export default function PlanDetailPage() {
         );
     }
 
-    // Extract airports from briefing data
-    const departure = briefingData?.route_info?.departure || 'KJFK';
-    const arrival = briefingData?.route_info?.arrival || 'KLAX';
+    // Extract airports from briefing data - check multiple possible sources
+    const departure = briefingData?.route_info?.departure || 
+                     briefingData?.origin || 
+                     briefingData?.briefing?.route?.split(' → ')[0] || 
+                     briefingData?.briefing?.route?.split('→')[0]?.trim() ||
+                     'DEP';
+    const arrival = briefingData?.route_info?.arrival || 
+                   briefingData?.destination || 
+                   briefingData?.briefing?.route?.split(' → ')[1] || 
+                   briefingData?.briefing?.route?.split('→')[1]?.trim() ||
+                   'ARR';
 
     return (
         <div className="min-h-screen flex flex-col bg-background text-foreground">
@@ -289,7 +297,12 @@ export default function PlanDetailPage() {
                             <CardContent className="flex items-center justify-between p-4">
                                 <div>
                                     <p className="text-sm text-muted-foreground">Distance</p>
-                                    <p className="text-lg font-semibold">{briefingData?.route_info?.distance_nm || 'N/A'} NM</p>
+                                    <p className="text-lg font-semibold">
+                                        {briefingData?.route_info?.distance_nm || 
+                                         briefingData?.briefing?.distance?.replace(' NM', '') || 
+                                         briefingData?.route_metrics?.actual_distance ||
+                                         'N/A'} NM
+                                    </p>
                                 </div>
                                 <Route className="h-8 w-8 text-green-600" />
                             </CardContent>
@@ -299,7 +312,12 @@ export default function PlanDetailPage() {
                             <CardContent className="flex items-center justify-between p-4">
                                 <div>
                                     <p className="text-sm text-muted-foreground">Flight Time</p>
-                                    <p className="text-lg font-semibold">{briefingData?.route_info?.duration || 'N/A'}</p>
+                                    <p className="text-lg font-semibold">
+                                        {briefingData?.route_info?.flight_time || 
+                                         briefingData?.briefing?.estimated_time || 
+                                         briefingData?.route_metrics?.calculated_time ||
+                                         'N/A'}
+                                    </p>
                                 </div>
                                 <Clock className="h-8 w-8 text-orange-600" />
                             </CardContent>

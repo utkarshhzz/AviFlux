@@ -34,55 +34,39 @@ export async function safePostRequest(data: string, detailLevel: string = "detai
             flightTime: Math.round(flightTime * 10) / 10
         };
 
-        // Mock response for testing - backend connectivity issues resolved with this approach
-        const mockResponse = {
-            success: true,
-            origin: departure,
-            destination: arrival, 
-            briefing: {
-                route: `${departure} → ${arrival}`,
-                distance: `${distance} NM`,
-                flight_time: `${Math.round(flightTime * 60)}m`,
-                weather_summary: "VFR conditions along entire route",
-                winds_aloft: "250°@15KT at FL100",
-                visibility: "> 10 SM",
-                ceiling: "BKN250",
-                temperature: "15°C"
-            },
-            waypoints: waypoints.length > 0 ? waypoints.map(wp => ({
-                code: wp,
-                weather: "VFR"
-            })) : [],
-            briefing_id: `WB-${Date.now()}`,
-            briefing_data: `Flight briefing for ${departure} to ${arrival}`,
-            generated_at: new Date().toISOString(),
-            data_sources: ["Mock Weather Service", "AviFlux Platform"]
-        };
-
-        // Simulate API call delay
-        await new Promise(resolve => setTimeout(resolve, 500));
+        // Call the actual dynamic route backend API
+        console.log(`🚀 Calling backend for route: ${departure} → ${arrival}`);
+        console.log(`📊 Route data:`, requestPayload);
         
-        const response = {
-            ok: true,
-            status: 200,
-            json: () => Promise.resolve(mockResponse)
-        };
+        const response = await fetch(`${import.meta.env.VITE_API_URL}/api/flight-briefing`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(requestPayload)
+        });
 
         if (!response.ok) {
             throw new Error(`HTTP error! Status: ${response.status}`);
         }
 
         const result = await response.json();
+        console.log(`✅ Backend response:`, result);
         
         // Transform the response to match the expected format
         return {
-            plan_id: result.briefing_id || `WB-${Date.now()}`,
+            plan_id: `WB-${Date.now()}`,
             airports: airports,
             route_type: route_type,
-            briefing_data: result.briefing_data,
+            briefing_data: result, // Pass the full backend response
             success: result.success,
-            generated_at: result.generated_at,
-            data_sources: result.data_sources
+            generated_at: result.generated_at || new Date().toISOString(),
+            route_info: {
+                departure: result.origin,
+                arrival: result.destination,
+                distance_nm: parseFloat(result.briefing?.distance?.replace(' NM', '') || '0'),
+                flight_time: result.briefing?.estimated_time
+            }
         };
     } catch (error) {
         console.error("Weather briefing request failed:", error);
