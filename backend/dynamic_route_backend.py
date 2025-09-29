@@ -7,6 +7,7 @@ Supports any airport pair with accurate distance calculations and ML predictions
 from flask import Flask, request, jsonify
 from flask_cors import CORS
 import math
+import os
 from datetime import datetime, timezone
 import logging
 
@@ -208,9 +209,12 @@ def health_check():
     })
 
 if __name__ == '__main__':
+    port = int(os.environ.get('PORT', 8005))
+    
     print("🚀 Starting AviFlux Dynamic Route Backend...")
     print("✅ Supports ANY route - not hardcoded to KJFK-KLAX")
     print("📊 Uses accurate distance and time calculations")
     print("🤖 Integrates ML predictions for specific routes")
+    print(f"🌐 Running on port {port}")
     
-    app.run(host='127.0.0.1', port=8005, debug=False)
+    app.run(host='0.0.0.0', port=port, debug=False)
